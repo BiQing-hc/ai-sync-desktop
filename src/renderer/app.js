@@ -45,7 +45,9 @@ function statCard(val, label, bg, color) {
 function platCardHTML(p) {
   var meta = "";
   if (p.installed) {
-    meta = '<div class="plat-meta"><span>📦 ' + p.skillsCount + ' 技能</span>';
+    var skillLabel = p.skillsCount + ' 技能';
+    if (p.userSkillsCount > 0 && p.marketplaceSkillsCount > 0) skillLabel += ' (' + p.userSkillsCount + ' 自建)';
+    meta = '<div class="plat-meta"><span>📦 ' + skillLabel + '</span>';
     if (p.memoryCount > 0) meta += '<span>🧠 ' + p.memoryCount + ' 记忆</span>';
     if (p.automationsCount > 0) meta += '<span>⚡ ' + p.automationsCount + ' 自动化</span>';
     meta += '<span class="compat-badge" style="background:' + p.compatInfo.color + '20;color:' + p.compatInfo.color + ';">' + p.compatInfo.label + '</span></div>';
@@ -69,7 +71,7 @@ function renderDashboard(m) {
     '</div>' +
     '<div class="card"><div class="card-hd"><span class="card-tt">主数据源</span><span class="src-badge"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:' + (source ? source.color : "#3b82f6") + ';color:white;font-size:10px;font-weight:700;">' + (source ? source.icon : "CB") + '</span>' + (source ? source.name : "CodeBuddy") + '</span></div><p style="font-size:13px;color:var(--text2);">用户技能、记忆、自动化任务将从主数据源同步到其他平台。<strong>不会同步平台内置的市场技能</strong>。</p></div>' +
     '<div class="card"><div class="card-hd"><span class="card-tt">已检测到的平台 (' + installed.length + ')</span><button class="btn btn-pri btn-sm" onclick="renderPage(\'sync\')">前往同步</button></div><div class="plat-grid" id="dash-grid"></div></div>' +
-    '<div class="guide-box"><strong>说明：</strong>这里统计的是<strong>您自己创建</strong>的技能和记忆，不包含平台内置的市场技能。同步也只会同步您自己的数据。</div>';
+    '<div class="guide-box"><strong>说明：</strong>技能数 = 自建技能 + 市场安装技能。<strong>同步只同步用户自建技能</strong>，不同步市场技能。</div>';
   const grid = document.getElementById("dash-grid");
   if (installed.length === 0) { grid.innerHTML = '<div class="empty"><div class="e-ico">◈</div><div>未检测到 AI 平台</div></div>'; return; }
   grid.innerHTML = installed.map(p => platCardHTML(p)).join("");
@@ -106,7 +108,7 @@ function showDetail(id) {
   const m = document.getElementById("main-content");
   var rows = '<tr><td>开发商</td><td>' + p.vendor + '</td></tr><tr><td>地区</td><td>' + (p.region === "cn" ? "国内" : "国外") + '</td></tr><tr><td>配置目录</td><td><code style="font-size:11px;">' + p.configDir + '</code></td></tr><tr><td>安装状态</td><td>' + (p.installed ? "✅ 已安装" : "❌ 未安装") + '</td></tr>';
   if (p.installed) {
-    rows += '<tr><td>用户技能</td><td>' + p.skillsCount + ' 个</td></tr>';
+    rows += '<tr><td>技能总数</td><td>' + p.skillsCount + ' 个（自建 ' + p.userSkillsCount + ' + 市场 ' + p.marketplaceSkillsCount + '）</td></tr>';
     if (p.memoryCount > 0) rows += '<tr><td>记忆条目</td><td>' + p.memoryCount + ' 条</td></tr>';
     if (p.automationsCount > 0) rows += '<tr><td>自动化任务</td><td>' + p.automationsCount + ' 个</td></tr>';
   }

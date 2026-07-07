@@ -279,6 +279,38 @@ function countUserSkills(resolvedDir, skillsDir) {
   } catch { return 0; }
 }
 
+// 统计市场安装技能数量
+// 扫描 <configDir>/plugins/marketplaces/*/plugins/ 和 external_plugins/ 下的子目录
+function countMarketplaceSkills(resolvedDir) {
+  if (!resolvedDir) return 0;
+  let count = 0;
+  const marketplacesDir = path.join(resolvedDir, "plugins", "marketplaces");
+  if (!fs.existsSync(marketplacesDir)) return 0;
+  try {
+    const marketplaces = fs.readdirSync(marketplacesDir, { withFileTypes: true })
+      .filter(e => e.isDirectory() && !e.name.startsWith("."));
+    for (const mp of marketplaces) {
+      // 扫描 <marketplace>/plugins/ 目录
+      const pluginsDir = path.join(marketplacesDir, mp.name, "plugins");
+      if (fs.existsSync(pluginsDir)) {
+        try {
+          count += fs.readdirSync(pluginsDir, { withFileTypes: true })
+            .filter(e => e.isDirectory() && !e.name.startsWith(".")).length;
+        } catch {}
+      }
+      // 扫描 <marketplace>/external_plugins/ 目录
+      const extDir = path.join(marketplacesDir, mp.name, "external_plugins");
+      if (fs.existsSync(extDir)) {
+        try {
+          count += fs.readdirSync(extDir, { withFileTypes: true })
+            .filter(e => e.isDirectory() && !e.name.startsWith(".")).length;
+        } catch {}
+      }
+    }
+  } catch { return 0; }
+  return count;
+}
+
 // 统计记忆文件数量
 function countMemoryFiles(resolvedDir, memoryDirs) {
   if (!resolvedDir || !memoryDirs) return 0;
@@ -310,7 +342,9 @@ function discoverPlatforms() {
   for (const plat of PLATFORMS) {
     const resolved = resolvePath(plat.configDir);
     const exists = fs.existsSync(resolved);
-    const skillsCount = exists ? countUserSkills(resolved, plat.skillsDir) : 0;
+    const userSkillsCount = exists ? countUserSkills(resolved, plat.skillsDir) : 0;
+    const marketplaceSkillsCount = exists ? countMarketplaceSkills(resolved) : 0;
+    const skillsCount = userSkillsCount + marketplaceSkillsCount;
     const memoryCount = exists ? countMemoryFiles(resolved, plat.memoryDirs) : 0;
     const automationsCount = exists ? countAutomations(resolved, plat.automationsDir) : 0;
     const compat = getPlatformCompatibility(plat);
@@ -320,6 +354,8 @@ function discoverPlatforms() {
       resolvedDir: resolved,
       installed: exists,
       skillsCount,
+      userSkillsCount,
+      marketplaceSkillsCount,
       memoryCount,
       automationsCount,
       compatibility: compat,
