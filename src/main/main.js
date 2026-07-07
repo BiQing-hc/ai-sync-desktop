@@ -78,7 +78,12 @@ app.whenReady().then(() => {
     return engine.getAllPlatforms().map(p => ({
       id: p.id, name: p.name, vendor: p.vendor, region: p.region,
       icon: p.icon, color: p.color, installed: p.installed,
-      skillsCount: p.skillsCount, compatibility: p.compatibility,
+      skillsCount: p.skillsCount,
+      userSkillsCount: p.userSkillsCount,
+      marketplaceSkillsCount: p.marketplaceSkillsCount,
+      memoryCount: p.memoryCount,
+      automationsCount: p.automationsCount,
+      compatibility: p.compatibility,
       compatInfo: p.compatInfo, description: p.description,
       configDir: p.resolvedDir, skillsDir: p.skillsDir,
       automationsDir: p.automationsDir, memoryDir: p.memoryDir,

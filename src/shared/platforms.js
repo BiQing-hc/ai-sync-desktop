@@ -280,35 +280,18 @@ function countUserSkills(resolvedDir, skillsDir) {
 }
 
 // 统计市场安装技能数量
-// 扫描 <configDir>/plugins/marketplaces/*/plugins/ 和 external_plugins/ 下的子目录
+// 读取 settings.json 的 enabledPlugins，只统计值为 true 的条目
 function countMarketplaceSkills(resolvedDir) {
   if (!resolvedDir) return 0;
-  let count = 0;
-  const marketplacesDir = path.join(resolvedDir, "plugins", "marketplaces");
-  if (!fs.existsSync(marketplacesDir)) return 0;
+  const settingsPath = path.join(resolvedDir, "settings.json");
+  if (!fs.existsSync(settingsPath)) return 0;
   try {
-    const marketplaces = fs.readdirSync(marketplacesDir, { withFileTypes: true })
-      .filter(e => e.isDirectory() && !e.name.startsWith("."));
-    for (const mp of marketplaces) {
-      // 扫描 <marketplace>/plugins/ 目录
-      const pluginsDir = path.join(marketplacesDir, mp.name, "plugins");
-      if (fs.existsSync(pluginsDir)) {
-        try {
-          count += fs.readdirSync(pluginsDir, { withFileTypes: true })
-            .filter(e => e.isDirectory() && !e.name.startsWith(".")).length;
-        } catch {}
-      }
-      // 扫描 <marketplace>/external_plugins/ 目录
-      const extDir = path.join(marketplacesDir, mp.name, "external_plugins");
-      if (fs.existsSync(extDir)) {
-        try {
-          count += fs.readdirSync(extDir, { withFileTypes: true })
-            .filter(e => e.isDirectory() && !e.name.startsWith(".")).length;
-        } catch {}
-      }
-    }
+    const raw = fs.readFileSync(settingsPath, "utf8");
+    const settings = JSON.parse(raw);
+    const enabled = settings.enabledPlugins;
+    if (!enabled || typeof enabled !== "object") return 0;
+    return Object.values(enabled).filter(v => v === true).length;
   } catch { return 0; }
-  return count;
 }
 
 // 统计记忆文件数量
