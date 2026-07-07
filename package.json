@@ -1,0 +1,51 @@
+{
+  "name": "ai-sync-desktop",
+  "version": "1.0.0",
+  "description": "AI Sync Desktop - AI 平台技能/记忆/模型跨平台同步工具",
+  "author": "AI Sync Team",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.aisync.desktop",
+    "productName": "AI Sync Desktop",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "AI Sync Desktop"
+    }
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

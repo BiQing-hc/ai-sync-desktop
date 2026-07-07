@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# ASAR extraction
+_app_src/
+
+# OS files
+Thumbs.db
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Electron
+out/
+
+# Environment
+.env
+.env.local
+
+# Backup files
+*.bak
